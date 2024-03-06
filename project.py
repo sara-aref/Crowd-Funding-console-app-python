@@ -34,14 +34,23 @@ def read_projects():
             return json.load(file_projects)
     except FileNotFoundError:
         return []
+    
+def validate_input(prompt, regex=None):
+    while True:
+        user_input = input(prompt)
+        if regex and not re.match(regex, user_input):
+            print(f'Invalid input. Please enter a valid value.')
+        elif user_input.strip():
+            return user_input
+        else:
+            print("Input can't be empty")
+        
 
 def registeration(users):
-    first_name = input("First Name: ")
-    last_name = input("Last Name: ")
-    email = input("Email: ")
-    while not re.match(email_regex, email):
-        print('Please enter valid email.')
-        email = input("Email: ")
+    print("User Registration")
+    first_name = validate_input("First Name: ", r'^[A-Za-z]+$')
+    last_name = validate_input("Last Name: ", r'^[A-Za-z]+$')
+    email = validate_input("Email: ", email_regex)
     if email in users:
         print("Email already registered")
         return
@@ -54,10 +63,7 @@ def registeration(users):
         print("Passwords don't match")
         password = getpass("password: ")
         confirm_password = getpass("Confirm Password: ")
-    phone = input("Phone: ")
-    while not re.match(phone_regex, phone):
-        print('Please enter valid phone number.')
-        phone = input("Phone: ")
+    phone = validate_input("Phone: ", phone_regex)
 
     users[email] = {
         'first_name': first_name,
@@ -70,8 +76,10 @@ def registeration(users):
     write_users(users)
     print("Registration successful.")
 
+
 def login(users):
-    email = input("Email: ")
+    print("User Login")
+    email = validate_input("Email: ", email_regex)
     password = getpass("Password: ")
     if email in users and users[email]['password'] == password:
         print("Login successful.")
@@ -81,48 +89,25 @@ def login(users):
         return None
 
 
-
 def create_project(current_user_email):
     if current_user_email is None:
         print("Please log in before creating a project.")
         return
     
-    title = input("Enter project title: ")
-    while not title.strip():
-        print("Title can't be empty.")
-        title = input("Enter project title: ")
-
-    details = input("Enter project details: ")
-    while not details.strip():
-        print("Details can't be empty.")
-        details = input("Enter project details: ")
+    title = validate_input("Enter project title: ")
+    details = validate_input("Enter project details: ")
 
     while True:
-        total_target_contain = input("Enter total target: ")
-        if total_target_contain.strip():
-            try:
-                total_target = float(total_target_contain)
-                break
-            except ValueError:
-                print("Invalid total target. Please enter a valid number")
-        else:
-            print("Total target can't be empty.")
+        total_target_contain = validate_input("Enter total target: ")
+        try:
+            total_target = float(total_target_contain)
+            break
+        except ValueError:
+            print("Invalid total target. Please enter a valid number")
 
     try:
-        start_time = input("Enter start time: ")
-        while not start_time.strip():
-            print("Start time can't be empty.")
-            start_time = input("Enter start time: ")
-
-        end_time = input("Enter end time: ")
-        while not end_time.strip():
-            print("End time can't be empty.")
-            end_time = input("Enter end time: ")
-
-        while not re.match(date_regex, start_time) or not re.match(date_regex, end_time):
-            print("Please Enter valid date.")
-            start_time = input("Enter start time: ")
-            end_time = input("Enter end time: ")
+        start_time = validate_input("Enter start time: ", date_regex)
+        end_time = validate_input("Enter end time: ", date_regex)
 
         start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M")
         end_time = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M")
@@ -147,7 +132,6 @@ def create_project(current_user_email):
     write_projects(projects)
 
     print("Project created successfully.")
-
 
 
 def view_projects(current_user_email):
@@ -175,12 +159,12 @@ def view_projects(current_user_email):
             index += 1
 
 
-
 def delete_project(current_user_email):
     if current_user_email is None:
         print("Please log in to delete a project.")
         return
     
+    view_projects(current_user_email)
     try:
         index = int(input("Enter the index of the project you want to delete: ")) - 1
 
@@ -198,12 +182,12 @@ def delete_project(current_user_email):
         print("Invalid index. Please enter a valid number")
 
 
-
-
 def edit_project(current_user_email):
     if current_user_email is None:
         print("Please log in to edit a project.")
         return
+    view_projects(current_user_email)
+
     try:
         index = int(input("Enter the index of the project you want to edit: ")) - 1
 
@@ -249,11 +233,6 @@ def edit_project(current_user_email):
         print("Invalid index. Please enter a valid number")
     except UnboundLocalError:
         print("Invalid index. Please enter a valid number")
-    
-
-
-
-
 
 
 
