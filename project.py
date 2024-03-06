@@ -147,6 +147,10 @@ def create_project(current_user_email):
 
 
 def view_projects(current_user_email):
+    if current_user_email is None:
+        print("Please log in to view a project.")
+        return
+
     if not projects:
         print("No projects available.")
     else:
@@ -169,61 +173,80 @@ def view_projects(current_user_email):
 
 
 def delete_project(current_user_email):
-    index = int(input("Enter the index of the project you want to delete: ")) - 1
+    if current_user_email is None:
+        print("Please log in to delete a project.")
+        return
+    
+    try:
+        index = int(input("Enter the index of the project you want to delete: ")) - 1
 
-    while index < 0 or index >= len(projects):
-        print("Please enter valid project index.")
-        index = int(input("Please enter the index of the project you want to delete: ")) - 1
+        if index < 0 or index >= len(projects):
+            print("Please enter a valid project index.")
+        elif projects[index]['user_email'] == current_user_email:
+            del projects[index]
+            write_projects(projects)
+            print("Project deleted successfully.")
+        else:
+            print(f"You don't have permission to delete project {index + 1}.")
+    except ValueError:
+        print("Invalid index. Please enter a valid number")
+    except UnboundLocalError:
+        print("Invalid index. Please enter a valid number")
 
-    if projects[index]['user_email'] == current_user_email:
-        del projects[index]
-        write_projects(projects)
-        print("Project deleted successfully.")
-    else:
-        print(f"You don't have permission to delete project {index}.")
 
 
 
 def edit_project(current_user_email):
-    index = int(input("Enter the index of the project you want to edit: ")) - 1
-
-    while index < 0 or index >= len(projects):
-        print("Please enter valid project index.")
-        index = int(input("Please enter the index of the project you want to edit: ")) - 1
-    
-    project = projects[index]
-
-    if project['user_email'] != current_user_email:
-        print(f"You do not have permission to edit project {index}.")
+    if current_user_email is None:
+        print("Please log in to edit a project.")
         return
+    try:
+        index = int(input("Enter the index of the project you want to edit: ")) - 1
 
-    title = input("Enter new project title (If you want to edit it): ")
-    details = input("Enter new project details (If you want to edit it): ")
-    total_target = input("Enter new total target (If you want to edit it): ")
-    start_time = input("Enter new start time (If you want to edit it): ")
-    end_time = input("Enter new end time (If you want to edit it): ")
+        while index < 0 or index >= len(projects):
+            print("Please enter valid project index.")
+            index = int(input("Please enter the index of the project you want to edit: ")) - 1
 
-    if title:
-        project['title'] = title
-    if details:
-        project['details'] = details
-    if total_target:
-        project['total_target'] = float(total_target)
-    if start_time:
-        while not re.match(date_regex, start_time):
-            print("Please Enter valid date.")
-            start_time = input("Enter new start time (If you want to edit it): ")
+        project = projects[index]
 
-        project['start_time'] = start_time
-    if end_time:
-        while not re.match(date_regex, end_time):
-            print("Please Enter valid date.")
-            end_time = input("Enter new end time (If you want to edit it): ")
+        if project['user_email'] != current_user_email:
+            print(f"You do not have permission to edit project {index + 1}.")
+            return
 
-        project['end_time'] = end_time
+        title = input("Enter new project title (If you want to edit it): ")
+        details = input("Enter new project details (If you want to edit it): ")
+        total_target = input("Enter new total target (If you want to edit it): ")
+        start_time = input("Enter new start time (If you want to edit it): ")
+        end_time = input("Enter new end time (If you want to edit it): ")
+
+        if title:
+            project['title'] = title
+        if details:
+            project['details'] = details
+        if total_target:
+            project['total_target'] = float(total_target)
+        if start_time:
+            while not re.match(date_regex, start_time):
+                print("Please Enter valid date.")
+                start_time = input("Enter new start time (If you want to edit it): ")
+
+            project['start_time'] = start_time
+        if end_time:
+            while not re.match(date_regex, end_time):
+                print("Please Enter valid date.")
+                end_time = input("Enter new end time (If you want to edit it): ")
+
+            project['end_time'] = end_time
     
-    write_projects(projects)
-    print("Project edited successfully.")
+        write_projects(projects)
+        print("Project edited successfully.")
+
+    except ValueError:
+        print("Invalid index. Please enter a valid number")
+    except UnboundLocalError:
+        print("Invalid index. Please enter a valid number")
+    
+
 
 
 
