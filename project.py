@@ -108,26 +108,30 @@ def create_project(current_user_email):
         else:
             print("Total target can't be empty.")
 
-    start_time = input("Enter start time: ")
-    while not start_time.strip():
-        print("Start time can't be empty.")
+    try:
         start_time = input("Enter start time: ")
+        while not start_time.strip():
+            print("Start time can't be empty.")
+            start_time = input("Enter start time: ")
 
-    end_time = input("Enter end time: ")
-    while not end_time.strip():
-        print("End time can't be empty.")
         end_time = input("Enter end time: ")
+        while not end_time.strip():
+            print("End time can't be empty.")
+            end_time = input("Enter end time: ")
 
-    while not re.match(date_regex, start_time) or not re.match(date_regex, end_time):
-        print("Please Enter valid date.")
-        start_time = input("Enter start time: ")
-        end_time = input("Enter end time: ")
+        while not re.match(date_regex, start_time) or not re.match(date_regex, end_time):
+            print("Please Enter valid date.")
+            start_time = input("Enter start time: ")
+            end_time = input("Enter end time: ")
 
-    start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M")
-    end_time = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M")
+        start_time = datetime.datetime.strptime(start_time, "%Y-%m-%d %H:%M")
+        end_time = datetime.datetime.strptime(end_time, "%Y-%m-%d %H:%M")
 
-    if start_time >= end_time:
-        print("Start time should be before End time.")
+        if start_time >= end_time:
+            print("Start time should be before End time.")
+            return
+    except ValueError:
+        print("Invalid date.")
         return
     
     project = {
